@@ -9,6 +9,7 @@
 This repo is fork of the [Evilginx](https://github.com/kgretzky/evilginx) and currently solve the following issues with the orignal version. 
 1. Timeout Problem Fixed! Evilginx2 timeout the requests if the websites take longer to respond and in result the users see a blank page. Now, default timeout is 60 seconds which was 15 seconds before. 
 2. `CORS` header problem fixed. Will set `Access-Control-Allow-Origin` for every proxied uri.
+3. Fixed hostname port bug. Refer here for more in the issue: [https://github.com/kgretzky/evilginx2/issues/118](https://github.com/kgretzky/evilginx2/issues/118)
 
 **evilginx2** is a man-in-the-middle attack framework used for phishing login credentials along with session cookies, which in turn allows to bypass 2-factor authentication protection.
 
